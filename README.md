@@ -5,7 +5,7 @@
   * [es_extended] (https://github.com/ESX-Org/es_extended)
 
 * To open cameras as Police
-  * [esx_policejob](https://github.com/ESX-Org/esx_policejob)
+  * [esx_policejob] (https://github.com/ESX-Org/esx_policejob)
 
 ## Download & Installation
 
