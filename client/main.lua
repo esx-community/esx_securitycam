@@ -19,6 +19,9 @@ local CurrentActionMsg        = ''
 local CurrentActionData       = {}
 local HasAlreadyEnteredMarker = false
 local LastZone                = nil
+local menuopen = false
+local bankcamera = false
+local policecamera = false
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -76,7 +79,7 @@ Citizen.CreateThread(function()
 
     for k,v in pairs(Config.Zones) do
 	if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
-      if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < v.Size.x) then
+      if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 2) then
         isInMarker  = true
         currentZone = k
       end
@@ -108,32 +111,79 @@ local screenEffect = "Seven_Eleven"
 Citizen.CreateThread(function()
     while true do
         for a = 1, #Config.Locations do
-            local ped = GetPlayerPed(PlayerId())
-            local pedPos = GetEntityCoords(ped, false)
-            local pedHead = GetEntityRotation(ped, 2)
-            if Config.DebugMode then
-                Draw3DText(pedPos.x, pedPos.y, pedPos.z + 0.6, tostring("X: " .. pedPos.x))
-                Draw3DText(pedPos.x, pedPos.y, pedPos.z + 0.4, tostring("Y: " .. pedPos.y))
-                Draw3DText(pedPos.x, pedPos.y, pedPos.z + 0.2, tostring("Z: " .. pedPos.z))
-                Draw3DText(pedPos.x, pedPos.y, pedPos.z, tostring("H: " .. pedHead))
-            end
 			if IsControlJustReleased(0, Keys['E']) and CurrentAction == 'cameras' then
+					if not menuopen then
+						menuopen = true
 						CurrentAction = nil
-                        local firstCamx = Config.Locations[a].cameras[1].x
-                        local firstCamy = Config.Locations[a].cameras[1].y
-                        local firstCamz = Config.Locations[a].cameras[1].z
-                        local firstCamr = Config.Locations[a].cameras[1].r
+						local elements = {
+						{label = _U('bank_menu_selection'), value = '1'},
+						{label = _U('police_menu_selection'), value = '2'}
+						}
+  
+						ESX.UI.Menu.CloseAll()
+
+						ESX.UI.Menu.Open(
+						'default', GetCurrentResourceName(), 'cloakroom',
+						{
+							title    = _U('securitycams_menu'),
+							align    = 'top-left',
+							elements = elements,
+						},
+						function(data, menu)
+	
+					if data.current.value == '1' then
+						menu.close()
+						bankcamera = true
+						local pP = GetPlayerPed(-1)
+						local firstCamx = Config.Locations[a].bankCameras[1].x
+                        local firstCamy = Config.Locations[a].bankCameras[1].y
+                        local firstCamz = Config.Locations[a].bankCameras[1].z
+                        local firstCamr = Config.Locations[a].bankCameras[1].r
 						SetFocusArea(firstCamx, firstCamy, firstCamz, firstCamx, firstCamy, firstCamz)
                         ChangeSecurityCamera(firstCamx, firstCamy, firstCamz, firstCamr)
                         SendNUIMessage({
                             type = "enablecam",
-                            label = Config.Locations[a].cameras[1].label,
-                            box = Config.Locations[a].camLabel.label
+                            label = Config.Locations[a].bankCameras[1].label,
+                            box = Config.Locations[a].bankCamLabel.label
                         })
 					
                         currentCameraIndex = a
                         currentCameraIndexIndex = 1
+						menuopen = false
+						
+					elseif data.current.value == '2' then
+						menu.close()
+						policecamera = true
+						local pP = GetPlayerPed(-1)
+						local firstCamx = Config.Locations[a].policeCameras[1].x
+                        local firstCamy = Config.Locations[a].policeCameras[1].y
+                        local firstCamz = Config.Locations[a].policeCameras[1].z
+                        local firstCamr = Config.Locations[a].policeCameras[1].r
+						SetFocusArea(firstCamx, firstCamy, firstCamz, firstCamx, firstCamy, firstCamz)
+                        ChangeSecurityCamera(firstCamx, firstCamy, firstCamz, firstCamr)
+                        SendNUIMessage({
+                            type = "enablecam",
+                            label = Config.Locations[a].policeCameras[1].label,
+                            box = Config.Locations[a].policeCamLabel.label
+                        })
+					
+                        currentCameraIndex = a
+                        currentCameraIndexIndex = 1
+						menuopen = false
+
+end
+
+    end,
+
+    function(data, menu)
+      menu.close()
+      	local pP = GetPlayerPed(-1)
+             menuopen = false
+    end
+)
+                        
                     end
+					end
 
             if createdCamera ~= 0 then
                 local instructions = CreateInstuctionScaleform("instructional_buttons")
@@ -162,49 +212,96 @@ Citizen.CreateThread(function()
 						TriggerEvent('esx_status:setDisplay', 1.0)
                     end
 					CurrentAction = nil
+					bankcamera = false
+					policecamera = false
 					
                 end
 
-                -- GO BACK CAMERA
-                if IsControlJustPressed(0, Keys["LEFT"]) then
+                -- GO BACK CAMERA (FOR PACIFIC STANDARD BANK)
+                if IsControlJustPressed(0, Keys["LEFT"]) and bankcamera then
                     local newCamIndex
 
                     if currentCameraIndexIndex == 1 then
-                        newCamIndex = #Config.Locations[currentCameraIndex].cameras
+                        newCamIndex = #Config.Locations[currentCameraIndex].bankCameras
                     else
                         newCamIndex = currentCameraIndexIndex - 1
                     end
 
-                    local newCamx = Config.Locations[currentCameraIndex].cameras[newCamIndex].x
-                    local newCamy = Config.Locations[currentCameraIndex].cameras[newCamIndex].y
-                    local newCamz = Config.Locations[currentCameraIndex].cameras[newCamIndex].z
-                    local newCamr = Config.Locations[currentCameraIndex].cameras[newCamIndex].r
+                    local newCamx = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].x
+                    local newCamy = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].y
+                    local newCamz = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].z
+                    local newCamr = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].r
 					SetFocusArea(newCamx, newCamy, newCamz, newCamx, newCamy, newCamz)
                     SendNUIMessage({
                         type = "updatecam",
-                        label = Config.Locations[currentCameraIndex].cameras[newCamIndex].label
+                        label = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].label
+                    })
+                    ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
+                    currentCameraIndexIndex = newCamIndex
+                end
+				
+				-- GO BACK CAMERA (FOR POLICE STATION)
+                if IsControlJustPressed(0, Keys["LEFT"]) and policecamera then
+                    local newCamIndex
+
+                    if currentCameraIndexIndex == 1 then
+                        newCamIndex = #Config.Locations[currentCameraIndex].policeCameras
+                    else
+                        newCamIndex = currentCameraIndexIndex - 1
+                    end
+
+                    local newCamx = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].x
+                    local newCamy = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].y
+                    local newCamz = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].z
+                    local newCamr = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].r
+					SetFocusArea(newCamx, newCamy, newCamz, newCamx, newCamy, newCamz)
+                    SendNUIMessage({
+                        type = "updatecam",
+                        label = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].label
                     })
                     ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
                     currentCameraIndexIndex = newCamIndex
                 end
 
                 -- GO FORWARD CAMERA
-                if IsControlJustPressed(0, Keys["RIGHT"]) then
+                if IsControlJustPressed(0, Keys["RIGHT"]) and bankcamera then
                     local newCamIndex
                     
-                    if currentCameraIndexIndex == #Config.Locations[currentCameraIndex].cameras then
+                    if currentCameraIndexIndex == #Config.Locations[currentCameraIndex].bankCameras then
                         newCamIndex = 1
                     else
                         newCamIndex = currentCameraIndexIndex + 1
                     end
 
-                    local newCamx = Config.Locations[currentCameraIndex].cameras[newCamIndex].x
-                    local newCamy = Config.Locations[currentCameraIndex].cameras[newCamIndex].y
-                    local newCamz = Config.Locations[currentCameraIndex].cameras[newCamIndex].z
-                    local newCamr = Config.Locations[currentCameraIndex].cameras[newCamIndex].r
+                    local newCamx = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].x
+                    local newCamy = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].y
+                    local newCamz = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].z
+                    local newCamr = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].r
                     SendNUIMessage({
                         type = "updatecam",
-                        label = Config.Locations[currentCameraIndex].cameras[newCamIndex].label
+                        label = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].label
+                    })
+                    ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
+                    currentCameraIndexIndex = newCamIndex
+                end
+				
+				-- GO FORWARD CAMERA
+                if IsControlJustPressed(0, Keys["RIGHT"]) and policecamera then
+                    local newCamIndex
+                    
+                    if currentCameraIndexIndex == #Config.Locations[currentCameraIndex].policeCameras then
+                        newCamIndex = 1
+                    else
+                        newCamIndex = currentCameraIndexIndex + 1
+                    end
+
+                    local newCamx = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].x
+                    local newCamy = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].y
+                    local newCamz = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].z
+                    local newCamr = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].r
+                    SendNUIMessage({
+                        type = "updatecam",
+                        label = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].label
                     })
                     ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
                     currentCameraIndexIndex = newCamIndex
@@ -216,6 +313,7 @@ Citizen.CreateThread(function()
         Citizen.Wait(0)
     end
 end)
+
 
 Citizen.CreateThread(function()
   while true do
