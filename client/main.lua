@@ -22,6 +22,7 @@ local LastZone                = nil
 local menuopen = false
 local bankcamera = false
 local policecamera = false
+local blockbuttons = false
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -134,6 +135,7 @@ Citizen.CreateThread(function()
 					if data.current.value == '1' then
 						menu.close()
 						bankcamera = true
+						blockbuttons = true
 						local pP = GetPlayerPed(-1)
 						local firstCamx = Config.Locations[a].bankCameras[1].x
                         local firstCamy = Config.Locations[a].bankCameras[1].y
@@ -150,10 +152,12 @@ Citizen.CreateThread(function()
                         currentCameraIndex = a
                         currentCameraIndexIndex = 1
 						menuopen = false
+						TriggerEvent('esx_securitycam:freeze', true)
 						
 					elseif data.current.value == '2' then
 						menu.close()
 						policecamera = true
+						blockbuttons = true
 						local pP = GetPlayerPed(-1)
 						local firstCamx = Config.Locations[a].policeCameras[1].x
                         local firstCamy = Config.Locations[a].policeCameras[1].y
@@ -170,6 +174,7 @@ Citizen.CreateThread(function()
                         currentCameraIndex = a
                         currentCameraIndexIndex = 1
 						menuopen = false
+						TriggerEvent('esx_securitycam:freeze', true)
 
 end
 
@@ -214,6 +219,8 @@ end
 					CurrentAction = nil
 					bankcamera = false
 					policecamera = false
+					blockbuttons = false
+					TriggerEvent('esx_securitycam:freeze', false)
 					
                 end
 
@@ -408,3 +415,34 @@ function InstructionButtonMessage(text)
     AddTextComponentScaleform(text)
     EndTextCommandScaleformString()
 end
+
+RegisterNetEvent('esx_securitycam:freeze')
+AddEventHandler('esx_securitycam:freeze', function(freeze)
+	FreezeEntityPosition(GetPlayerPed(-1), freeze)
+end)
+
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(10)
+		if blockbuttons then
+			DisableControlAction(2, 24, true)
+			DisableControlAction(2, 257, true)
+			DisableControlAction(2, 25, true)
+			DisableControlAction(2, 263, true)
+			DisableControlAction(2, Keys['R'], true)
+			DisableControlAction(2, Keys['bottom-right'], true)
+			DisableControlAction(2, Keys['SPACE'], true)
+			DisableControlAction(2, Keys['Q'], true)
+			DisableControlAction(2, Keys['TAB'], true)
+			DisableControlAction(2, Keys['F'], true)
+			DisableControlAction(2, Keys['F1'], true)
+			DisableControlAction(2, Keys['F2'], true)
+			DisableControlAction(2, Keys['F3'], true)
+			DisableControlAction(2, Keys['F6'], true)
+			DisableControlAction(2, Keys['F7'], true)
+			DisableControlAction(2, Keys['F10'], true)
+		else
+			Citizen.Wait(1000)
+		end
+	end
+end)
