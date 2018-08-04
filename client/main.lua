@@ -10,7 +10,6 @@ local Keys = {
 	["NENTER"] = 201, ["N4"] = 108, ["N5"] = 60, ["N6"] = 107, ["N+"] = 96, ["N-"] = 97, ["N7"] = 117, ["N8"] = 61, ["N9"] = 118
 }
 
--- ESX
 ESX             			  = nil
 local PlayerData			  = {}
 local inMarker 				  = false
@@ -59,7 +58,6 @@ AddEventHandler('esx_securitycam:hasExitedMarker', function (zone)
   CurrentAction = nil
 end)
 
--- Enter / Exit marker events
 Citizen.CreateThread(function()
   while true do
 
@@ -102,7 +100,6 @@ Citizen.CreateThread(function()
   end
 end)
 
--- Cameras
 local cameraActive = false
 local currentCameraIndex = 0
 local currentCameraIndexIndex = 0
@@ -224,7 +221,7 @@ end
 					
                 end
 
-                -- GO BACK CAMERA (FOR PACIFIC STANDARD BANK)
+                -- GO BACK CAMERA
                 if IsControlJustPressed(0, Keys["LEFT"]) then
 					if bankcamera then
 						local newCamIndex
@@ -311,10 +308,24 @@ end
 						})
 						ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
 						currentCameraIndexIndex = newCamIndex
-					
-					end			
+					end
 				end
-            end
+				
+				if Config.Locations[currentCameraIndex].policeCameras[currentCameraIndexIndex].canRotate then
+                    local getCameraRot = GetCamRot(createdCamera, 2)
+
+                    -- ROTATE LEFT
+                    if IsControlPressed(1, Keys['N4']) then
+                        SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z + 0.7, 2)
+                    end
+
+                    -- ROTATE RIGHT
+                    if IsControlPressed(1, Keys['N6']) then
+                        SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z - 0.7, 2)
+                    end
+                end
+            
+			end
         Citizen.Wait(0)
     end
 	end
@@ -334,9 +345,6 @@ Citizen.CreateThread(function()
   end
 end)
 
----------------------------------------------------------------------------
--- FUNCTIONS
----------------------------------------------------------------------------
 function ChangeSecurityCamera(x, y, z, r)
     if createdCamera ~= 0 then
         DestroyCam(createdCamera, 0)
@@ -430,6 +438,7 @@ Citizen.CreateThread(function()
 			DisableControlAction(2, 25, true)
 			DisableControlAction(2, 263, true)
 			DisableControlAction(2, Keys['R'], true)
+			DisableControlAction(2, Keys['bottom-right'], true)
 			DisableControlAction(2, Keys['SPACE'], true)
 			DisableControlAction(2, Keys['Q'], true)
 			DisableControlAction(2, Keys['TAB'], true)
