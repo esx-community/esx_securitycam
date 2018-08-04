@@ -22,6 +22,7 @@ local menuopen = false
 local bankcamera = false
 local policecamera = false
 local blockbuttons = false
+local hacked = false
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -52,6 +53,16 @@ AddEventHandler('esx_securitycam:hasEnteredMarker', function (zone)
     CurrentAction     = 'cameras'
     CurrentActionMsg  = _U('marker_hint')
   end
+  
+  if zone == 'HackingPolice' and not menuopen then
+    CurrentAction     = 'hackingPolice'
+    CurrentActionMsg  = _U('marker_hint_hacking')
+  end
+  
+  if zone == 'HackingBank' and not menuopen then
+    CurrentAction     = 'hackingBank'
+    CurrentActionMsg  = _U('marker_hint_hacking')
+  end
 end)
 
 AddEventHandler('esx_securitycam:hasExitedMarker', function (zone)
@@ -72,6 +83,12 @@ Citizen.CreateThread(function()
       end
 	 end
     end
+	
+	for k,v in pairs(Config.HackingPolice) do
+      if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
+        DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
+      end
+    end
 
     local isInMarker  = false
     local currentZone = nil
@@ -83,6 +100,13 @@ Citizen.CreateThread(function()
         currentZone = k
       end
 	 end
+    end
+	
+	for k,v in pairs(Config.HackingPolice) do
+      if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 2) then
+        isInMarker  = true
+        currentZone = k
+      end
     end
 
     if (isInMarker and not HasAlreadyEnteredMarker) or (isInMarker and LastZone ~= currentZone) then
@@ -110,7 +134,8 @@ Citizen.CreateThread(function()
     while true do
         for a = 1, #Config.Locations do
 			if IsControlJustReleased(0, Keys['E']) and CurrentAction == 'cameras' then
-					if not menuopen then
+
+					if not menuopen and not hacked then
 						menuopen = true
 						CurrentAction = nil
 						local elements = {
@@ -130,6 +155,15 @@ Citizen.CreateThread(function()
 						function(data, menu)
 	
 					if data.current.value == '1' then
+						if hacked then
+							TriggerEvent("pNotify:SendNotification",{
+								text = "Kamerorna är ur funktion! <br />Åk till huvudanläggningen för att se så att allt står rätt till.",
+								type = "warning",
+								timeout = (10000),
+								layout = "bottomCenter",
+								queue = "global"
+							})
+					elseif not hacked then
 						menu.close()
 						bankcamera = true
 						blockbuttons = true
@@ -150,6 +184,7 @@ Citizen.CreateThread(function()
                         currentCameraIndexIndex = 1
 						menuopen = false
 						TriggerEvent('esx_securitycam:freeze', true)
+					end
 						
 					elseif data.current.value == '2' then
 						menu.close()
@@ -311,7 +346,20 @@ end
 					end
 				end
 				
-				if Config.Locations[currentCameraIndex].policeCameras[currentCameraIndexIndex].canRotate then
+				if Config.Locations[currentCameraIndex].bankCameras[currentCameraIndexIndex].canRotate then
+                    local getCameraRot = GetCamRot(createdCamera, 2)
+
+                    -- ROTATE LEFT
+                    if IsControlPressed(1, Keys['N4']) then
+                        SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z + 0.7, 2)
+                    end
+
+                    -- ROTATE RIGHT
+                    if IsControlPressed(1, Keys['N6']) then
+                        SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z - 0.7, 2)
+                    end
+				
+				elseif Config.Locations[currentCameraIndex].policeCameras[currentCameraIndexIndex].canRotate then
                     local getCameraRot = GetCamRot(createdCamera, 2)
 
                     -- ROTATE LEFT
@@ -330,7 +378,6 @@ end
     end
 	end
 end)
-
 
 Citizen.CreateThread(function()
   while true do
