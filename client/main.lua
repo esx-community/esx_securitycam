@@ -22,7 +22,6 @@ local menuopen = false
 local bankcamera = false
 local policecamera = false
 local blockbuttons = false
-local hacked = false
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -135,7 +134,7 @@ Citizen.CreateThread(function()
         for a = 1, #Config.Locations do
 			if IsControlJustReleased(0, Keys['E']) and CurrentAction == 'cameras' then
 
-					if not menuopen and not hacked then
+					if not menuopen then
 						menuopen = true
 						CurrentAction = nil
 						local elements = {
@@ -155,15 +154,6 @@ Citizen.CreateThread(function()
 						function(data, menu)
 	
 					if data.current.value == '1' then
-						if hacked then
-							TriggerEvent("pNotify:SendNotification",{
-								text = "Kamerorna är ur funktion! <br />Åk till huvudanläggningen för att se så att allt står rätt till.",
-								type = "warning",
-								timeout = (10000),
-								layout = "bottomCenter",
-								queue = "global"
-							})
-					elseif not hacked then
 						menu.close()
 						bankcamera = true
 						blockbuttons = true
@@ -184,7 +174,7 @@ Citizen.CreateThread(function()
                         currentCameraIndexIndex = 1
 						menuopen = false
 						TriggerEvent('esx_securitycam:freeze', true)
-					end
+					
 						
 					elseif data.current.value == '2' then
 						menu.close()
