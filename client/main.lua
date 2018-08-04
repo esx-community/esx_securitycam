@@ -53,15 +53,6 @@ AddEventHandler('esx_securitycam:hasEnteredMarker', function (zone)
     CurrentActionMsg  = _U('marker_hint')
   end
   
-  if zone == 'HackingPolice' and not menuopen then
-    CurrentAction     = 'hackingPolice'
-    CurrentActionMsg  = _U('marker_hint_hacking')
-  end
-  
-  if zone == 'HackingBank' and not menuopen then
-    CurrentAction     = 'hackingBank'
-    CurrentActionMsg  = _U('marker_hint_hacking')
-  end
 end)
 
 AddEventHandler('esx_securitycam:hasExitedMarker', function (zone)
@@ -82,12 +73,6 @@ Citizen.CreateThread(function()
       end
 	 end
     end
-	
-	for k,v in pairs(Config.HackingPolice) do
-      if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
-        DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
-      end
-    end
 
     local isInMarker  = false
     local currentZone = nil
@@ -99,13 +84,6 @@ Citizen.CreateThread(function()
         currentZone = k
       end
 	 end
-    end
-	
-	for k,v in pairs(Config.HackingPolice) do
-      if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 2) then
-        isInMarker  = true
-        currentZone = k
-      end
     end
 
     if (isInMarker and not HasAlreadyEnteredMarker) or (isInMarker and LastZone ~= currentZone) then
