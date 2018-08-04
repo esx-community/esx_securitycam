@@ -16,7 +16,6 @@
 
 ## Configuration
 -  * To hide the HUD when accessing the cameras set `Config.HideHUD` to `true` in `config.lua`
-   * To enable debugmode set `Config.DebugMode` to `true` in `config.lua`
 
 # Credits
 ### xander1998
