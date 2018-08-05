@@ -5,7 +5,7 @@ Config.DrawDistance               = 100.0
 Config.HideRadar       		  = true
 
 -- Language (sv/en)
-Config.Locale 			  = 'sv'
+Config.Locale 			  = 'en'
 
 Config.Zones = {
 	Cameras = {
