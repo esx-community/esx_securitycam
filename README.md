@@ -6,6 +6,12 @@
 
 * To open cameras as Police
   * [esx_policejob] (https://github.com/ESX-Org/esx_policejob)
+  
+ * Hacking device
+  * [mhacking] (https://github.com/GHMatti/FiveM-Scripts)
+  
+ * Advanced notifications
+  * [pNotify] (https://github.com/Nick78111/pNotify)
 
 ## Download & Installation
 
@@ -15,13 +21,11 @@
 - Add `start esx_securitycam` to your server.cfg
 
 ## Configuration
--  * To hide the HUD when accessing the cameras set `Config.HideHUD` to `true` in `config.lua`
+-  * Look at the WIKI and you will get all the information you need!
 
-# Credits
-### xander1998
+# Original Code
 Thanks to xander1998 for the original code (Non ESX). 
   * [securitycams] (https://github.com/xander1998/securitycams)
-  * [xander1998 Github] (https://github.com/xander1998)
 
 # Legal
 ### License
