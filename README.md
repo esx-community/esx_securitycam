@@ -7,10 +7,10 @@
 * To open cameras as Police
   * [esx_policejob] (https://github.com/ESX-Org/esx_policejob)
   
- * Hacking device
+* Hacking device
   * [mhacking] (https://github.com/GHMatti/FiveM-Scripts)
   
- * Advanced notifications
+* Advanced notifications
   * [pNotify] (https://github.com/Nick78111/pNotify)
 
 ## Download & Installation
