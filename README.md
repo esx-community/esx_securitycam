@@ -1,16 +1,16 @@
 # esx_securitycam
 
 ### Requirements
-* ESX
+* ES_EXTENDED
   * [es_extended] (https://github.com/ESX-Org/es_extended)
 
-* To open cameras as Police
+* ESX_POLICEJOB
   * [esx_policejob] (https://github.com/ESX-Org/esx_policejob)
   
-* Hacking device
+* MHACKING
   * [mhacking] (https://github.com/GHMatti/FiveM-Scripts)
   
-* Advanced notifications
+* PNOTIFY
   * [pNotify] (https://github.com/Nick78111/pNotify)
 
 ## Download & Installation
