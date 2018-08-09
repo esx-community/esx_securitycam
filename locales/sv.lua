@@ -32,4 +32,16 @@ Locales['sv'] = {
 	['pcam5'] = 'Polisens Parkering & Garage',
 	['pcam6'] = 'Utanför Entré',
 	['pcam7'] = 'Lobby',
+	
+	-- Hack
+	['marker_hint_hacking_policestation'] = 'Klicka ~INPUT_CONTEXT~ för att hacka polisens ~g~kameror~s~',
+	['marker_hint_hacking_bank'] = 'Klicka ~INPUT_CONTEXT~ för att hacka bankens ~g~kameror~s~',
+	['broken_cameras'] = 'Kamerorna är ur funktion! <br />Åk till huvudanläggningen för att se så att allt står rätt till.',
+	['hacking_succeed'] = 'Hackning slutförd! <br />Poliserna kan inte längre se i kamerorna.',
+	['hacking_failed'] = 'Hackning misslyckad! <br />Polisen har blivit tillkallad.',
+	['infected_cameras'] = 'Kamerorna är infekterade! <br />Polisen kan inte längre se i kamerorna.',
+    ['nothing_wrong'] = 'Det är inget fel på kamerorna?',
+	['removing_viruses'] = 'Virus hittat! Tar bort virus från serverdatorn...',
+	['unhack_policestation'] = 'Klicka ~INPUT_CONTEXT~ för att ta bort ~g~virus~s~',
+	['unhack_bank'] = 'Klicka ~INPUT_CONTEXT~ för att ta bort ~g~virus~s~',
 }

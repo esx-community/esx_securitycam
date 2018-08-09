@@ -32,4 +32,16 @@ Locales['en'] = {
 	['pcam5'] = 'Polices Parking Lot & Garage',
 	['pcam6'] = 'Outside Entrance',
 	['pcam7'] = 'Lobby',
+	
+	-- Hack
+	['marker_hint_hacking_policestation'] = 'Press ~INPUT_CONTEXT~ to hack the police stations ~g~cameras~s~',
+	['marker_hint_hacking_bank'] = 'Press ~INPUT_CONTEXT~ to hack the banks ~g~cameras~s~',
+	['broken_cameras'] = 'Cameras are down! <br />Go to the cameras main plant to see if anything is wrong.',
+	['hacking_succeed'] = 'Hacking complete! <br />The police cant connect to the cameras anymore.',
+	['hacking_failed'] = 'Hacking incomplete! <br />The police are on their way.',
+	['infected_cameras'] = 'Cameras have been infected! <br />The police cant connect to the cameras.',
+	['nothing_wrong'] = 'There is nothing wrong?',
+	['removing_viruses'] = 'Virus found! Starting to clean up the virus...',
+	['unhack_policestation'] = 'Press ~INPUT_CONTEXT~ to get rid of the ~g~virus~s~',
+	['unhack_bank'] = 'Press ~INPUT_CONTEXT~ to get rid of the ~g~virus~s~',
 }
