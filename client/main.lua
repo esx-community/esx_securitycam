@@ -630,7 +630,6 @@ Citizen.CreateThread(function()
 			if bankHacked then
 				TriggerServerEvent('esx_securitycam:unhackanimserver')
 				TriggerServerEvent('esx_securitycam:setBankHackedState', false)
-				bankHacked = false
 
 				if Config.pNotify then
 					TriggerEvent("pNotify:SendNotification", {
