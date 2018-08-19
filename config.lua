@@ -1,5 +1,5 @@
 Config                            = {}
-Config.DrawDistance               = 100.0
+Config.DrawDistance               = 20.0
 
 -- Hide HUD
 Config.HideRadar       		  = true
@@ -24,44 +24,25 @@ Config.Zones = {
 		Size  = {x = 1.7, y = 1.7, z = 0.5},
 		Color = {r = 26, g = 55, b = 186},
 		Type = 1,
-	}
-}
-
--- Keep these the same
--- Place: Behind the polices desk in the policestation
--- Screenshot: https://i.imgur.com/f5WNrRj.jpg
-Config.HackingPolice = {
+	},
 	HackingPolice = {
 		Pos   = {x = 440.17, y = -975.74, z = 29.69},
 		Size  = {x = 1.7, y = 1.7, z = 0.5},
 		Color = {r = 26, g = 55, b = 186},
 		Type = 1,
-	}
-}
-
-Config.UnHackPolice = {
+	},
 	UnHackPolice = {
 		Pos   = {x = 440.17, y = -975.74, z = 29.69},
 		Size  = {x = 1.7, y = 1.7, z = 0.5},
 		Color = {r = 26, g = 55, b = 186},
 		Type = 1,
-	}
-}
---
-
--- Keep these the same
--- Place: Down at the bank vault
--- Screenshot: https://i.imgur.com/nvcFUhu.jpg
-Config.HackingBank = {
+	},
 	HackingBank = {
 		Pos   = {x = 264.87, y = 219.93, z = 100.68},
 		Size  = {x = 1.7, y = 1.7, z = 0.5},
 		Color = {r = 26, g = 55, b = 186},
 		Type = 1,
-	}
-}
-
-Config.UnHackBank = {
+	},
 	UnHackBank = {
 		Pos   = {x = 264.87, y = 219.93, z = 100.68},
 		Size  = {x = 1.7, y = 1.7, z = 0.5},
@@ -69,7 +50,6 @@ Config.UnHackBank = {
 		Type = 1,
 	}
 }
---
 
 -- Cameras. You could add more cameras for other banks, apartments, houses, buildings etc. (Remember the "," after each row, but not on the last row)
 Config.Locations = {
