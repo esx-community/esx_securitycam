@@ -13,10 +13,14 @@ files {
 }
 
 server_scripts {
-  '@mysql-async/lib/MySQL.lua',
-  'server/main.lua',
-  'config.lua',
-}
+   '@mysql-async/lib/MySQL.lua',
+   'server/main.lua',
+   '@es_extended/locale.lua',
+   'locales/en.lua',
+   'locales/sv.lua',
+   'config.lua',
+   'server/main.lua',
+ }
 
 client_scripts {
   '@es_extended/locale.lua',
