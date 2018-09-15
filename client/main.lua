@@ -12,7 +12,7 @@ local Keys = {
 
 ESX             			  = nil
 local PlayerData			  = {}
-local inMarker 				  = false
+local isInMarker 				  = false
 local CurrentAction           = nil
 local CurrentActionMsg        = ''
 local CurrentActionData       = {}
@@ -493,6 +493,7 @@ Citizen.CreateThread(function()
 		  elseif not policeHacked then
 			TriggerEvent("mhacking:show")
 			TriggerEvent("mhacking:start",2,13,mycbpolice)
+			CurrentAction = nil
 		  end
 		end
 		Citizen.Wait(0)
@@ -728,7 +729,6 @@ Citizen.CreateThread(function()
 			DisableControlAction(2, 25, true)
 			DisableControlAction(2, 263, true)
 			DisableControlAction(2, Keys['R'], true)
-			DisableControlAction(2, Keys['bottom-right'], true)
 			DisableControlAction(2, Keys['SPACE'], true)
 			DisableControlAction(2, Keys['Q'], true)
 			DisableControlAction(2, Keys['TAB'], true)
