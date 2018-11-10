@@ -32,6 +32,11 @@ Locales['en'] = {
 	['pcam5'] = 'Polices Parking Lot & Garage',
 	['pcam6'] = 'Outside Entrance',
 	['pcam7'] = 'Lobby',
+
+	-- Settings
+	['next'] = 'NEXT CAMERA',
+	['previous'] = 'PREVIOUS CAMERA',
+	['close'] = 'CLOSE CAMERA',
 	
 	-- Hack
 	['marker_hint_hacking_policestation'] = 'Press ~INPUT_CONTEXT~ to hack the police stations ~g~cameras~s~',
