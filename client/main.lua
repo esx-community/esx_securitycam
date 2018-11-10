@@ -10,20 +10,20 @@ local Keys = {
 	["NENTER"] = 201, ["N4"] = 108, ["N5"] = 60, ["N6"] = 107, ["N+"] = 96, ["N-"] = 97, ["N7"] = 117, ["N8"] = 61, ["N9"] = 118
 }
 
-ESX             			  = nil
-local PlayerData			  = {}
-local isInMarker 				  = false
-local CurrentAction           = nil
-local CurrentActionMsg        = ''
-local CurrentActionData       = {}
-local HasAlreadyEnteredMarker = false
-local LastZone                = nil
-local menuopen 				  = false
-local bankcamera 			  = false
-local policecamera			  = false
-local blockbuttons 			  = false
-local bankHacked 			  = false
-local policeHacked 			  = false
+ESX             			  	= nil
+local PlayerData			  	= {}
+local isInMarker 				= false
+local CurrentAction 			= nil
+local CurrentActionMsg        	= ''
+local CurrentActionData 		= {}
+local HasAlreadyEnteredMarker 	= false
+local LastZone                	= nil
+local menuopen 				  	= false
+local bankcamera 			  	= false
+local policecamera			  	= false
+local blockbuttons 			  	= false
+local bankHacked 			  	= false
+local policeHacked 			  	= false
 
 Citizen.CreateThread(function()
 	while ESX == nil do
@@ -86,46 +86,156 @@ Citizen.CreateThread(function()
 
 		Citizen.Wait(5)
 
-		local coords = GetEntityCoords(GetPlayerPed(-1))
+	local coords = GetEntityCoords(GetPlayerPed(-1))
 
-		for k, v in pairs(Config.Zones) do
-			if k == 'Cameras' or k == 'UnHackPolice' or k == 'UnHackBank' then
-				if PlayerData.job.name == 'police' then
-					if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
-						DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
-						if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
-							isInMarker = true
-							currentZone = k
-						end
-					end
-				end
-			else
-				if PlayerData.job.name ~= 'police' then
-					if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
-						DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
-						if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
-							isInMarker = true
-							currentZone = k
-						end
-					end
-				end
-			end
-		end
+	for k, v in pairs(Config.Zones) do
+	if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+	  if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
+		DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
+	  	if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
+	  	DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Starta kamerorna.", 0.80)
+	  end
+	  end
+	 end
+	end
 
+	for k, v in pairs(Config.HackingPolice) do
+	if Config.Hacking then
+	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+		-- nothing
+	 else
+	  if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
+		DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
+	  if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
+	  	DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Börja hacka kamerorna.", 0.80)
+	  end
+	  end
+	 end
+	end
+	end
 
-		if (isInMarker and not HasAlreadyEnteredMarker) or (isInMarker and LastZone ~= currentZone) then
-			HasAlreadyEnteredMarker = true
-			LastZone = currentZone
-			TriggerEvent('esx_securitycam:hasEnteredMarker', currentZone)
-		end
+	for k, v in pairs(Config.HackingBank) do
+	if Config.Hacking then
+	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+		-- nothing
+	 else
+	  if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
+		DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
+	  if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
+	  	DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Börja hacka kamerorna.", 0.80)
+	  end
+	  end
+	 end
+	end
+	end
 
-		if not isInMarker and HasAlreadyEnteredMarker then
-			HasAlreadyEnteredMarker = false
-			TriggerEvent('esx_securitycam:hasExitedMarker', LastZone)
-			CurrentAction = nil
-			ESX.UI.Menu.CloseAll()
-		end
-  	end
+	for k, v in pairs(Config.UnHackPolice) do
+	if Config.Hacking then
+	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+		if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
+		DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
+	  	if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
+	  	DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Ta bort virus.", 0.80)
+	  end
+	  end
+	 else
+
+	 end
+	end
+	end
+
+	for k, v in pairs(Config.UnHackBank) do
+	if Config.Hacking then
+	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+		if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
+		DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
+	  	if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
+	  	DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Ta bort virus.", 0.80)
+	  end
+	  end
+	 else
+
+	 end
+	end
+	end
+
+	local isInMarker  = false
+	local currentZone = nil
+
+	for k,v in pairs(Config.Zones) do
+	if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+	  if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
+		isInMarker  = true
+		currentZone = k
+	  end
+	 end
+	end
+
+	for k,v in pairs(Config.HackingPolice) do
+	if Config.Hacking then
+	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+	 -- nothing
+	 else
+	  if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
+		isInMarker  = true
+		currentZone = k
+	  end
+	 end
+	end
+	end
+
+	for k,v in pairs(Config.HackingBank) do
+	if Config.Hacking then
+	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+	 -- nothing
+	 else
+	  if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
+		isInMarker  = true
+		currentZone = k
+	  end
+	 end
+	end
+	end
+
+	for k,v in pairs(Config.UnHackPolice) do
+	if Config.Hacking then
+	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+	  if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
+		isInMarker  = true
+		currentZone = k
+	  end
+	 else
+	  -- nothing
+	 end
+	end
+	end
+
+	for k,v in pairs(Config.UnHackBank) do
+	if Config.Hacking then
+	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+	  if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
+		isInMarker  = true
+		currentZone = k
+	  end
+	 else
+	 -- nothing
+	 end
+	end
+	end
+
+	if (isInMarker and not HasAlreadyEnteredMarker) or (isInMarker and LastZone ~= currentZone) then
+	  HasAlreadyEnteredMarker = true
+	  LastZone = currentZone
+	  TriggerEvent('esx_securitycam:hasEnteredMarker', currentZone)
+	end
+
+	if not isInMarker and HasAlreadyEnteredMarker then
+	  HasAlreadyEnteredMarker = false
+	  TriggerEvent('esx_securitycam:hasExitedMarker', LastZone)
+	  CurrentAction = nil
+	  ESX.UI.Menu.CloseAll()
+	end
+  end
 end)
 
 local cameraActive = false
@@ -171,7 +281,7 @@ Citizen.CreateThread(function()
 					  else
 					  ESX.ShowNotification(_U('broken_cameras'))
 					  end
-					elseif not bankHacked then
+						else
 						menu.close()
 						bankcamera = true
 						blockbuttons = true
@@ -207,7 +317,7 @@ Citizen.CreateThread(function()
 						else
 							ESX.ShowNotification(_U('broken_cameras'))
 						end
-					elseif not policeHacked then
+						else
 						menu.close()
 						policecamera = true
 						blockbuttons = true
@@ -507,7 +617,7 @@ Citizen.CreateThread(function()
 		  if bankHacked then
 			if Config.pNotify then
 			TriggerEvent("pNotify:SendNotification",{
-							text = "The cameras are infected! <br />The police can't connect to the cameras.",
+							text = _U('infected_cameras'),
 							type = "success",
 							timeout = (7000),
 							layout = "bottomCenter",
@@ -554,7 +664,7 @@ Citizen.CreateThread(function()
 
 				if Config.pNotify then
 					TriggerEvent("pNotify:SendNotification",{
-						text = "There is nothing wrong with the cameras?",
+						text = _U('nothing_wrong'),
 						type = "success",
 						timeout = (7000),
 						layout = "bottomCenter",
@@ -614,7 +724,7 @@ Citizen.CreateThread(function()
 end)
 
 
-Citizen.CreateThread(function()
+--[[Citizen.CreateThread(function()
   while true do
 	Wait(0)
 	if CurrentAction ~= nil then
@@ -623,7 +733,7 @@ Citizen.CreateThread(function()
 	  DisplayHelpTextFromStringLabel(0, 0, 1, -1)
 	end
   end
-end)
+end)]]
 
 function ChangeSecurityCamera(x, y, z, r)
 	if createdCamera ~= 0 then
@@ -663,22 +773,22 @@ function CreateInstuctionScaleform(scaleform)
 	PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
 	PushScaleformMovieFunctionParameterInt(0)
 	InstructionButton(GetControlInstructionalButton(0, Keys["RIGHT"], true))
-	InstructionButtonMessage("Next Camera")
-	-- InstructionButtonMessage("Nästa Kamera") --SV LANGUAGE
+	--InstructionButtonMessage("Next Camera")
+	InstructionButtonMessage(_U('next')) --SV LANGUAGE
 	PopScaleformMovieFunctionVoid()
 
 	PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
 	PushScaleformMovieFunctionParameterInt(1)
 	InstructionButton(GetControlInstructionalButton(0, Keys["LEFT"], true))
-	InstructionButtonMessage("Previous Camera")
-	-- InstructionButtonMessage("Förra Kameran") --SV LANGUAGE
+	--InstructionButtonMessage("Previous Camera")
+	InstructionButtonMessage(_U('previous')) --SV LANGUAGE
 	PopScaleformMovieFunctionVoid()
 
 	PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
 	PushScaleformMovieFunctionParameterInt(2)
 	InstructionButton(GetControlInstructionalButton(0, Keys["BACKSPACE"], true))
-	InstructionButtonMessage("Close Cameras")
-	-- InstructionButtonMessage("Stäng Kamerorna") --SV LANGUAGE
+	--InstructionButtonMessage("Close Cameras")
+	InstructionButtonMessage(_U('close')) --SV LANGUAGE
 	PopScaleformMovieFunctionVoid()
 
 	PushScaleformMovieFunction(scaleform, "DRAW_INSTRUCTIONAL_BUTTONS")
@@ -744,6 +854,24 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
+
+function DrawText3D(x, y, z, text, scale)
+    local onScreen, _x, _y = World3dToScreen2d(x, y, z)
+    local pX, pY, pZ = table.unpack(GetGameplayCamCoords())
+ 
+    SetTextScale(scale, scale)
+    SetTextFont(4)
+    SetTextProportional(1)
+    SetTextEntry("STRING")
+    SetTextCentre(1)
+    SetTextColour(255, 255, 255, 215)
+ 
+    AddTextComponentString(text)
+    DrawText(_x, _y)
+ 
+    local factor = (string.len(text)) / 230
+    DrawRect(_x, _y + 0.0250, 0.095 + factor, 0.06, 41, 11, 41, 100)
+end
 
 RegisterNetEvent('esx_securitycam:setBankHackedState')
 AddEventHandler('esx_securitycam:setBankHackedState', function(state)
