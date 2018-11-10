@@ -1,14 +1,14 @@
-Config                            = {}
-Config.DrawDistance               = 20.0
+Config = {}
+Config.DrawDistance = 20.0
 
 -- Hide HUD
-Config.HideRadar       		  = true
+Config.HideRadar = true
 
 -- Animation for the hacking in seconds. 60 = 1 minute / 60 seconds!
 Config.AnimTime = 60
 
 -- Language (sv/en)
-Config.Locale 			  = 'en'
+Config.Locale = 'en'
 
 -- Only enable this if you have pNotify (https://github.com/Nick78111/pNotify)
 Config.pNotify = false
@@ -23,31 +23,50 @@ Config.Zones = {
 		Pos   = {x = 454.38, y = -979.35, z = 29.69},
 		Size  = {x = 1.7, y = 1.7, z = 0.5},
 		Color = {r = 26, g = 55, b = 186},
-		Type = 1,
-	},
+		Type = 27,
+	}
+}
+
+-- Keep these the same
+-- Place: Behind the polices desk in the policestation
+-- Screenshot: https://i.imgur.com/f5WNrRj.jpg
+Config.HackingPolice = {
 	HackingPolice = {
 		Pos   = {x = 440.17, y = -975.74, z = 29.69},
 		Size  = {x = 1.7, y = 1.7, z = 0.5},
 		Color = {r = 26, g = 55, b = 186},
-		Type = 1,
-	},
+		Type = 27,
+	}
+}
+
+Config.UnHackPolice = {
 	UnHackPolice = {
 		Pos   = {x = 440.17, y = -975.74, z = 29.69},
 		Size  = {x = 1.7, y = 1.7, z = 0.5},
 		Color = {r = 26, g = 55, b = 186},
-		Type = 1,
-	},
+		Type = 27,
+	}
+}
+--
+
+-- Keep these the same
+-- Place: Down at the bank vault
+-- Screenshot: https://i.imgur.com/nvcFUhu.jpg
+Config.HackingBank = {
 	HackingBank = {
 		Pos   = {x = 264.87, y = 219.93, z = 100.68},
 		Size  = {x = 1.7, y = 1.7, z = 0.5},
 		Color = {r = 26, g = 55, b = 186},
-		Type = 1,
-	},
+		Type = 27,
+	}
+}
+
+Config.UnHackBank = {
 	UnHackBank = {
 		Pos   = {x = 264.87, y = 219.93, z = 100.68},
 		Size  = {x = 1.7, y = 1.7, z = 0.5},
 		Color = {r = 26, g = 55, b = 186},
-		Type = 1,
+		Type = 27,
 	}
 }
 
