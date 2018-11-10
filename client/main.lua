@@ -10,536 +10,535 @@ local Keys = {
 	["NENTER"] = 201, ["N4"] = 108, ["N5"] = 60, ["N6"] = 107, ["N+"] = 96, ["N-"] = 97, ["N7"] = 117, ["N8"] = 61, ["N9"] = 118
 }
 
-ESX             			  	= nil
-local PlayerData			  	= {}
-local isInMarker 				= false
-local CurrentAction 			= nil
-local CurrentActionMsg        	= ''
-local CurrentActionData 		= {}
-local HasAlreadyEnteredMarker 	= false
-local LastZone                	= nil
-local menuopen 				  	= false
-local bankcamera 			  	= false
-local policecamera			  	= false
-local blockbuttons 			  	= false
-local bankHacked 			  	= false
-local policeHacked 			  	= false
+ESX = nil
+local PlayerData = {}
+local isInMarker = false
+local CurrentAction = nil
+local CurrentActionMsg = ''
+local HasAlreadyEnteredMarker = false
+local LastZone = nil
+local menuopen = false
+local bankcamera = false
+local policecamera = false
+local blockbuttons = false
+local bankHacked = false
+local policeHacked  = false
+local currentCameraIndex = 0
+local currentCameraIndexIndex = 0
+local createdCamera = 0
 
 Citizen.CreateThread(function()
 	while ESX == nil do
+		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 		Citizen.Wait(0)
-
-		TriggerEvent('esx:getSharedObject', function(obj)
-			ESX = obj
-
-			if ESX.IsPlayerLoaded() == true then
-				PlayerData = ESX.GetPlayerData()
-			end
-		end)
 	end
-end)
 
+	while ESX.GetPlayerData().job == nil do
+		Citizen.Wait(100)
+	end
+
+	PlayerData = ESX.GetPlayerData()
+end)
+ 
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded', function(xPlayer)
-  PlayerData = xPlayer
+	PlayerData = xPlayer
 end)
 
 RegisterNetEvent('esx:setJob')
 AddEventHandler('esx:setJob', function(job)
-  PlayerData.job = job
+	PlayerData.job = job
 end)
 
 AddEventHandler('esx_securitycam:hasEnteredMarker', function (zone)
-  if zone == 'Cameras' and not menuopen then
-	CurrentAction     = 'cameras'
-	CurrentActionMsg  = _U('marker_hint')
-  end
-
-  if zone == 'HackingPolice' and not menuopen then
-	CurrentAction     = 'hackingPolice'
-	CurrentActionMsg  = _U('marker_hint_hacking_policestation')
-  end
-
-  if zone == 'HackingBank' and not menuopen then
-	CurrentAction     = 'hackingBank'
-	CurrentActionMsg  = _U('marker_hint_hacking_bank')
-  end
-
-  if zone == 'UnHackPolice' and not menuopen then
-	CurrentAction     = 'UnHackPolice'
-	CurrentActionMsg  = _U('unhack_policestation')
-  end
-
-  if zone == 'UnHackBank' and not menuopen then
-	CurrentAction     = 'UnHackBank'
-	CurrentActionMsg  = _U('unhack_bank')
-  end
+	if zone == 'Cameras' and not menuopen then
+		CurrentAction     = 'cameras'
+		CurrentActionMsg  = _U('marker_hint')
+	elseif zone == 'HackingPolice' and not menuopen then
+		CurrentAction     = 'hackingPolice'
+		CurrentActionMsg  = _U('marker_hint_hacking_policestation')
+	elseif zone == 'HackingBank' and not menuopen then
+		CurrentAction     = 'hackingBank'
+		CurrentActionMsg  = _U('marker_hint_hacking_bank')
+	elseif zone == 'UnHackPolice' and not menuopen then
+		CurrentAction     = 'UnHackPolice'
+		CurrentActionMsg  = _U('unhack_policestation')
+	elseif zone == 'UnHackBank' and not menuopen then
+		CurrentAction     = 'UnHackBank'
+		CurrentActionMsg  = _U('unhack_bank')
+	end
 end)
 
-AddEventHandler('esx_securitycam:hasExitedMarker', function (zone)
-  CurrentAction = nil
+AddEventHandler('esx_securitycam:hasExitedMarker', function(zone)
+	CurrentAction = nil
 end)
-
-Citizen.CreateThread(function()
-	Citizen.Wait(0)
-  	while true do
-
-		Citizen.Wait(5)
-
-	local coords = GetEntityCoords(GetPlayerPed(-1))
-
-	for k, v in pairs(Config.Zones) do
-	if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
-	  if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
-		DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
-	  	if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
-	  	DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Starta kamerorna.", 0.80)
-	  end
-	  end
-	 end
-	end
-
-	for k, v in pairs(Config.HackingPolice) do
-	if Config.Hacking then
-	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
-		-- nothing
-	 else
-	  if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
-		DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
-	  if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
-	  	DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Börja hacka kamerorna.", 0.80)
-	  end
-	  end
-	 end
-	end
-	end
-
-	for k, v in pairs(Config.HackingBank) do
-	if Config.Hacking then
-	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
-		-- nothing
-	 else
-	  if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
-		DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
-	  if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
-	  	DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Börja hacka kamerorna.", 0.80)
-	  end
-	  end
-	 end
-	end
-	end
-
-	for k, v in pairs(Config.UnHackPolice) do
-	if Config.Hacking then
-	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
-		if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
-		DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
-	  	if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
-	  	DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Ta bort virus.", 0.80)
-	  end
-	  end
-	 else
-
-	 end
-	end
-	end
-
-	for k, v in pairs(Config.UnHackBank) do
-	if Config.Hacking then
-	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
-		if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
-		DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
-	  	if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
-	  	DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Ta bort virus.", 0.80)
-	  end
-	  end
-	 else
-
-	 end
-	end
-	end
-
-	local isInMarker  = false
-	local currentZone = nil
-
-	for k,v in pairs(Config.Zones) do
-	if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
-	  if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
-		isInMarker  = true
-		currentZone = k
-	  end
-	 end
-	end
-
-	for k,v in pairs(Config.HackingPolice) do
-	if Config.Hacking then
-	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
-	 -- nothing
-	 else
-	  if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
-		isInMarker  = true
-		currentZone = k
-	  end
-	 end
-	end
-	end
-
-	for k,v in pairs(Config.HackingBank) do
-	if Config.Hacking then
-	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
-	 -- nothing
-	 else
-	  if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
-		isInMarker  = true
-		currentZone = k
-	  end
-	 end
-	end
-	end
-
-	for k,v in pairs(Config.UnHackPolice) do
-	if Config.Hacking then
-	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
-	  if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
-		isInMarker  = true
-		currentZone = k
-	  end
-	 else
-	  -- nothing
-	 end
-	end
-	end
-
-	for k,v in pairs(Config.UnHackBank) do
-	if Config.Hacking then
-	 if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
-	  if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
-		isInMarker  = true
-		currentZone = k
-	  end
-	 else
-	 -- nothing
-	 end
-	end
-	end
-
-	if (isInMarker and not HasAlreadyEnteredMarker) or (isInMarker and LastZone ~= currentZone) then
-	  HasAlreadyEnteredMarker = true
-	  LastZone = currentZone
-	  TriggerEvent('esx_securitycam:hasEnteredMarker', currentZone)
-	end
-
-	if not isInMarker and HasAlreadyEnteredMarker then
-	  HasAlreadyEnteredMarker = false
-	  TriggerEvent('esx_securitycam:hasExitedMarker', LastZone)
-	  CurrentAction = nil
-	  ESX.UI.Menu.CloseAll()
-	end
-  end
-end)
-
-local cameraActive = false
-local currentCameraIndex = 0
-local currentCameraIndexIndex = 0
-local createdCamera = 0
-local screenEffect = "Seven_Eleven"
 
 Citizen.CreateThread(function()
 	while true do
-		for a = 1, #Config.Locations do
-			if IsControlJustReleased(0, Keys['E']) and CurrentAction == 'cameras' then
+		Citizen.Wait(1)
 
-					if not menuopen then
-						menuopen = true
-						CurrentAction = nil
-						local elements = {
-						{label = _U('bank_menu_selection'), value = 'bankmenu'},
-						{label = _U('police_menu_selection'), value = 'policemenu'}
-						}
+		local coords = GetEntityCoords(PlayerPedId())
 
-						ESX.UI.Menu.CloseAll()
+		for k, v in pairs(Config.Zones) do
+			if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+				if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
+					DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
 
-						ESX.UI.Menu.Open(
-						'default', GetCurrentResourceName(), 'cloakroom',
-						{
-							title    = _U('securitycams_menu'),
-							align    = 'top-left',
-							elements = elements,
-						},
-						function(data, menu)
-
-				if data.current.value == 'bankmenu' then
-					if bankHacked then
-					  if Config.pNotify then
-						TriggerEvent("pNotify:SendNotification",{
-							text = _U('broken_cameras'),
-							type = "warning",
-							timeout = (10000),
-							layout = "bottomCenter",
-							queue = "global"
-						})
-					  else
-					  ESX.ShowNotification(_U('broken_cameras'))
-					  end
-						else
-						menu.close()
-						bankcamera = true
-						blockbuttons = true
-						local pP = GetPlayerPed(-1)
-						local firstCamx = Config.Locations[a].bankCameras[1].x
-						local firstCamy = Config.Locations[a].bankCameras[1].y
-						local firstCamz = Config.Locations[a].bankCameras[1].z
-						local firstCamr = Config.Locations[a].bankCameras[1].r
-						SetFocusArea(firstCamx, firstCamy, firstCamz, firstCamx, firstCamy, firstCamz)
-						ChangeSecurityCamera(firstCamx, firstCamy, firstCamz, firstCamr)
-						SendNUIMessage({
-							type = "enablecam",
-							label = Config.Locations[a].bankCameras[1].label,
-							box = Config.Locations[a].bankCamLabel.label
-						})
-
-						currentCameraIndex = a
-						currentCameraIndexIndex = 1
-						menuopen = false
-						TriggerEvent('esx_securitycam:freeze', true)
-					end
-
-					elseif data.current.value == 'policemenu' then
-						if policeHacked then
-							if Config.pNotify then
-							TriggerEvent("pNotify:SendNotification",{
-								text = _U('broken_cameras'),
-								type = "warning",
-								timeout = (10000),
-								layout = "bottomCenter",
-								queue = "global"
-							})
-						else
-							ESX.ShowNotification(_U('broken_cameras'))
-						end
-						else
-						menu.close()
-						policecamera = true
-						blockbuttons = true
-						local pP = GetPlayerPed(-1)
-						local firstCamx = Config.Locations[a].policeCameras[1].x
-						local firstCamy = Config.Locations[a].policeCameras[1].y
-						local firstCamz = Config.Locations[a].policeCameras[1].z
-						local firstCamr = Config.Locations[a].policeCameras[1].r
-						SetFocusArea(firstCamx, firstCamy, firstCamz, firstCamx, firstCamy, firstCamz)
-						ChangeSecurityCamera(firstCamx, firstCamy, firstCamz, firstCamr)
-						SendNUIMessage({
-							type = "enablecam",
-							label = Config.Locations[a].policeCameras[1].label,
-							box = Config.Locations[a].policeCamLabel.label
-						})
-
-						currentCameraIndex = a
-						currentCameraIndexIndex = 1
-						menuopen = false
-						TriggerEvent('esx_securitycam:freeze', true)
-					end
-
-				end
-
-						end,
-
-	function(data, menu)
-	  menu.close()
-	  	local pP = GetPlayerPed(-1)
-			 menuopen = false
-	end
-)
-
-					end
-					end
-
-			if createdCamera ~= 0 then
-				local instructions = CreateInstuctionScaleform("instructional_buttons")
-
-				DrawScaleformMovieFullscreen(instructions, 255, 255, 255, 255, 0)
-				SetTimecycleModifier("scanline_cam_cheap")
-				SetTimecycleModifierStrength(2.0)
-
-				 if Config.HideRadar then
-					DisplayRadar(false)
-					ESX.UI.HUD.SetDisplay(0.0)
-					TriggerEvent('es:setMoneyDisplay', 0.0)
-					TriggerEvent('esx_status:setDisplay', 0.0)
-				end
-
-				-- CLOSE CAMERAS
-				if IsControlJustPressed(0, Keys["BACKSPACE"]) then
-					CloseSecurityCamera()
-					SendNUIMessage({
-						type = "disablecam",
-					})
-					if Config.HideRadar then
-						DisplayRadar(true)
-						ESX.UI.HUD.SetDisplay(1.0)
-						TriggerEvent('es:setMoneyDisplay', 1.0)
-						TriggerEvent('esx_status:setDisplay', 1.0)
-					end
-					CurrentAction = nil
-					bankcamera = false
-					policecamera = false
-					blockbuttons = false
-					TriggerEvent('esx_securitycam:freeze', false)
-
-				end
-
-				-- GO BACK CAMERA
-				if IsControlJustPressed(0, Keys["LEFT"]) then
-					if bankcamera then
-						local newCamIndex
-
-						if currentCameraIndexIndex == 1 then
-							newCamIndex = #Config.Locations[currentCameraIndex].bankCameras
-						else
-							newCamIndex = currentCameraIndexIndex - 1
-						end
-
-						local newCamx = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].x
-						local newCamy = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].y
-						local newCamz = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].z
-						local newCamr = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].r
-						SetFocusArea(newCamx, newCamy, newCamz, newCamx, newCamy, newCamz)
-						SendNUIMessage({
-							type = "updatecam",
-							label = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].label
-						})
-						ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
-						currentCameraIndexIndex = newCamIndex
-
-					elseif policecamera then
-						local newCamIndex
-
-						if currentCameraIndexIndex == 1 then
-							newCamIndex = #Config.Locations[currentCameraIndex].policeCameras
-						else
-							newCamIndex = currentCameraIndexIndex - 1
-						end
-
-						local newCamx = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].x
-						local newCamy = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].y
-						local newCamz = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].z
-						local newCamr = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].r
-						SetFocusArea(newCamx, newCamy, newCamz, newCamx, newCamy, newCamz)
-						SendNUIMessage({
-							type = "updatecam",
-							label = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].label
-						})
-						ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
-						currentCameraIndexIndex = newCamIndex
+					if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
+						DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Starta kamerorna.", 0.80)
 					end
 				end
-
-
-				-- GO FORWARD CAMERA
-				if IsControlJustPressed(0, Keys["RIGHT"]) then
-					if bankcamera then
-						local newCamIndex
-
-						if currentCameraIndexIndex == #Config.Locations[currentCameraIndex].bankCameras then
-							newCamIndex = 1
-						else
-							newCamIndex = currentCameraIndexIndex + 1
-						end
-
-						local newCamx = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].x
-						local newCamy = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].y
-						local newCamz = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].z
-						local newCamr = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].r
-						SendNUIMessage({
-							type = "updatecam",
-							label = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].label
-						})
-						ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
-						currentCameraIndexIndex = newCamIndex
-					elseif policecamera then
-						local newCamIndex
-
-						if currentCameraIndexIndex == #Config.Locations[currentCameraIndex].policeCameras then
-							newCamIndex = 1
-						else
-							newCamIndex = currentCameraIndexIndex + 1
-						end
-
-						local newCamx = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].x
-						local newCamy = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].y
-						local newCamz = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].z
-						local newCamr = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].r
-						SendNUIMessage({
-							type = "updatecam",
-							label = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].label
-						})
-						ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
-						currentCameraIndexIndex = newCamIndex
-					end
-				end
-
-				if Config.Locations[currentCameraIndex].bankCameras[currentCameraIndexIndex].canRotate then
-					local getCameraRot = GetCamRot(createdCamera, 2)
-
-					-- ROTATE LEFT
-					if IsControlPressed(1, Keys['N4']) then
-						SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z + 0.7, 2)
-					end
-
-					-- ROTATE RIGHT
-					if IsControlPressed(1, Keys['N6']) then
-						SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z - 0.7, 2)
-					end
-
-				elseif Config.Locations[currentCameraIndex].policeCameras[currentCameraIndexIndex].canRotate then
-					local getCameraRot = GetCamRot(createdCamera, 2)
-
-					-- ROTATE LEFT
-					if IsControlPressed(1, Keys['N4']) then
-						SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z + 0.7, 2)
-					end
-
-					-- ROTATE RIGHT
-					if IsControlPressed(1, Keys['N6']) then
-						SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z - 0.7, 2)
-					end
-				end
-
 			end
-		Citizen.Wait(0)
-	end
+		end
+
+		for k, v in pairs(Config.HackingPolice) do
+			if Config.Hacking then
+				if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+					-- nothing
+				else
+					if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
+						DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
+
+						if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
+							DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Börja hacka kamerorna.", 0.80)
+						end
+					end
+				end
+			end
+		end
+
+		for k, v in pairs(Config.HackingBank) do
+			if Config.Hacking then
+				if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+					-- nothing
+				else
+					if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
+						DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
+
+						if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
+							DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Börja hacka kamerorna.", 0.80)
+						end
+					end
+				end
+			end
+		end
+
+		for k, v in pairs(Config.UnHackPolice) do
+			if Config.Hacking then
+				if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+					if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
+						DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
+
+						if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
+							DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Ta bort virus.", 0.80)
+						end
+					end
+				end
+			end
+		end
+
+		for k, v in pairs(Config.UnHackBank) do
+			if Config.Hacking then
+				if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+					if(v.Type ~= -1 and GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < Config.DrawDistance) then
+						DrawMarker(v.Type, v.Pos.x, v.Pos.y, v.Pos.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, v.Size.x, v.Size.y, v.Size.z, v.Color.r, v.Color.g, v.Color.b, 100, false, true, 2, false, false, false, false)
+
+						if GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5 then
+							DrawText3D(v.Pos.x, v.Pos.y, v.Pos.z+0.9, "~w~[~g~E~w~] Ta bort virus.", 0.80)
+						end
+					end
+				end
+			end
+		end
+
+		local currentZone = nil
+
+		for k,v in pairs(Config.Zones) do
+			if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+				if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
+					isInMarker  = true
+					currentZone = k
+				end
+			end
+		end
+
+		for k,v in pairs(Config.HackingPolice) do
+			if Config.Hacking then
+				if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+					-- nothing
+				else
+					if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
+						isInMarker  = true
+						currentZone = k
+					end
+				end
+			end
+		end
+
+		for k,v in pairs(Config.HackingBank) do
+			if Config.Hacking then
+				if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+					-- nothing
+				else
+					if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
+						isInMarker  = true
+						currentZone = k
+					end
+				end
+			end
+		end
+
+		for k,v in pairs(Config.UnHackPolice) do
+			if Config.Hacking then
+				if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+					if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
+						isInMarker  = true
+						currentZone = k
+					end
+				end
+			end
+		end
+
+		for k,v in pairs(Config.UnHackBank) do
+			if Config.Hacking then
+				if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
+					if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
+						isInMarker  = true
+						currentZone = k
+					end
+				end
+			end
+		end
+
+		if (isInMarker and not HasAlreadyEnteredMarker) or (isInMarker and LastZone ~= currentZone) then
+			HasAlreadyEnteredMarker = true
+			LastZone = currentZone
+			TriggerEvent('esx_securitycam:hasEnteredMarker', currentZone)
+		end
+
+		if not isInMarker and HasAlreadyEnteredMarker then
+			HasAlreadyEnteredMarker = false
+			TriggerEvent('esx_securitycam:hasExitedMarker', LastZone)
+			CurrentAction = nil
+			ESX.UI.Menu.CloseAll()
+		end
 	end
 end)
 
-function mycbpolice(success, timeremaining)
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(10)
+
+		if IsControlJustReleased(0, Keys['E']) and CurrentAction == 'cameras' then
+
+			if not menuopen then
+				CurrentAction, menuopen = nil, true
+
+				local elements = {
+					{label = _U('bank_menu_selection'),   value = 'bankmenu'},
+					{label = _U('police_menu_selection'), value = 'policemenu'}
+				}
+
+				ESX.UI.Menu.CloseAll()
+
+				ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'cloakroom',
+				{
+					title    = _U('securitycams_menu'),
+					align    = 'top-left',
+					elements = elements
+				}, function(data, menu)
+
+					if data.current.value == 'bankmenu' then
+
+						if bankHacked then
+							if Config.pNotify then
+								TriggerEvent("pNotify:SendNotification",{
+									text = _U('broken_cameras'),
+									type = "warning",
+									timeout = (10000),
+									layout = "bottomCenter",
+									queue = "global"
+								})
+							else
+								ESX.ShowNotification(_U('broken_cameras'))
+							end
+						else
+							menu.close()
+							bankcamera = true
+							blockbuttons = true
+							local firstCamx = Config.Locations[1].bankCameras[1].x
+							local firstCamy = Config.Locations[1].bankCameras[1].y
+							local firstCamz = Config.Locations[1].bankCameras[1].z
+							local firstCamr = Config.Locations[1].bankCameras[1].r
+							SetFocusArea(firstCamx, firstCamy, firstCamz, firstCamx, firstCamy, firstCamz)
+							ChangeSecurityCamera(firstCamx, firstCamy, firstCamz, firstCamr)
+
+							if Config.HideRadar then
+								StartHideHUD()
+							end
+
+							SendNUIMessage({
+								type = "enablecam",
+								label = Config.Locations[1].bankCameras[1].label,
+								box = Config.Locations[1].bankCamLabel.label
+							})
+
+							currentCameraIndex = 1
+							currentCameraIndexIndex = 1
+							menuopen = false
+							TriggerEvent('esx_securitycam:freeze', true)
+						end
+
+					elseif data.current.value == 'policemenu' then
+
+						if policeHacked then
+							if Config.pNotify then
+								TriggerEvent("pNotify:SendNotification",{
+									text = _U('broken_cameras'),
+									type = "warning",
+									timeout = (10000),
+									layout = "bottomCenter",
+									queue = "global"
+								})
+							else
+								ESX.ShowNotification(_U('broken_cameras'))
+							end
+						else
+							menu.close()
+							policecamera = true
+							blockbuttons = true
+							local firstCamx = Config.Locations[1].policeCameras[1].x
+							local firstCamy = Config.Locations[1].policeCameras[1].y
+							local firstCamz = Config.Locations[1].policeCameras[1].z
+							local firstCamr = Config.Locations[1].policeCameras[1].r
+
+							SetFocusArea(firstCamx, firstCamy, firstCamz, firstCamx, firstCamy, firstCamz)
+							ChangeSecurityCamera(firstCamx, firstCamy, firstCamz, firstCamr)
+
+							if Config.HideRadar then
+								StartHideHUD()
+							end
+
+							SendNUIMessage({
+								type  = "enablecam",
+								label = Config.Locations[1].policeCameras[1].label,
+								box   = Config.Locations[1].policeCamLabel.label
+							})
+
+							currentCameraIndex = 1
+							currentCameraIndexIndex = 1
+							menuopen = false
+							TriggerEvent('esx_securitycam:freeze', true)
+						end
+
+					end
+
+				end, function(data, menu)
+					menu.close()
+					menuopen = false
+				end)
+
+			end
+		end
+
+		if createdCamera ~= 0 then
+			local instructions = CreateInstuctionScaleform("instructional_buttons")
+
+			DrawScaleformMovieFullscreen(instructions, 255, 255, 255, 255, 0)
+			SetTimecycleModifier("scanline_cam_cheap")
+			SetTimecycleModifierStrength(2.0)
+
+			-- CLOSE CAMERAS
+			if IsControlJustPressed(0, Keys["BACKSPACE"]) then
+				CloseSecurityCamera()
+				SendNUIMessage({
+					type = "disablecam",
+				})
+
+				if Config.HideRadar then
+					DisplayRadar(true)
+					ESX.UI.HUD.SetDisplay(1.0)
+					TriggerEvent('es:setMoneyDisplay', 1.0)
+					TriggerEvent('esx_status:setDisplay', 1.0)
+				end
+
+				CurrentAction = nil
+				bankcamera = false
+				policecamera = false
+				blockbuttons = false
+				TriggerEvent('esx_securitycam:freeze', false)
+			end
+
+			-- GO BACK CAMERA
+			if IsControlJustPressed(0, Keys["LEFT"]) then
+				if bankcamera then
+					local newCamIndex
+
+					if currentCameraIndexIndex == 1 then
+						newCamIndex = #Config.Locations[currentCameraIndex].bankCameras
+					else
+						newCamIndex = currentCameraIndexIndex - 1
+					end
+
+					local newCamx = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].x
+					local newCamy = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].y
+					local newCamz = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].z
+					local newCamr = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].r
+
+					SetFocusArea(newCamx, newCamy, newCamz, newCamx, newCamy, newCamz)
+					SendNUIMessage({
+						type = "updatecam",
+						label = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].label
+					})
+
+					ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
+					currentCameraIndexIndex = newCamIndex
+				elseif policecamera then
+					local newCamIndex
+
+					if currentCameraIndexIndex == 1 then
+						newCamIndex = #Config.Locations[currentCameraIndex].policeCameras
+					else
+						newCamIndex = currentCameraIndexIndex - 1
+					end
+
+					local newCamx = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].x
+					local newCamy = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].y
+					local newCamz = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].z
+					local newCamr = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].r
+
+					SetFocusArea(newCamx, newCamy, newCamz, newCamx, newCamy, newCamz)
+					SendNUIMessage({
+						type = "updatecam",
+						label = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].label
+					})
+
+					ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
+					currentCameraIndexIndex = newCamIndex
+				end
+			end
+
+			-- GO FORWARD CAMERA
+			if IsControlJustPressed(0, Keys["RIGHT"]) then
+				if bankcamera then
+					local newCamIndex
+
+					if currentCameraIndexIndex == #Config.Locations[currentCameraIndex].bankCameras then
+						newCamIndex = 1
+					else
+						newCamIndex = currentCameraIndexIndex + 1
+					end
+
+					local newCamx = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].x
+					local newCamy = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].y
+					local newCamz = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].z
+					local newCamr = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].r
+
+					SendNUIMessage({
+						type = "updatecam",
+						label = Config.Locations[currentCameraIndex].bankCameras[newCamIndex].label
+					})
+
+					ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
+					currentCameraIndexIndex = newCamIndex
+				elseif policecamera then
+					local newCamIndex
+
+					if currentCameraIndexIndex == #Config.Locations[currentCameraIndex].policeCameras then
+						newCamIndex = 1
+					else
+						newCamIndex = currentCameraIndexIndex + 1
+					end
+
+					local newCamx = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].x
+					local newCamy = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].y
+					local newCamz = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].z
+					local newCamr = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].r
+
+					SendNUIMessage({
+						type = "updatecam",
+						label = Config.Locations[currentCameraIndex].policeCameras[newCamIndex].label
+					})
+
+					ChangeSecurityCamera(newCamx, newCamy, newCamz, newCamr)
+					currentCameraIndexIndex = newCamIndex
+				end
+			end
+
+			if Config.Locations[currentCameraIndex].bankCameras[currentCameraIndexIndex].canRotate then
+				local getCameraRot = GetCamRot(createdCamera, 2)
+
+				-- ROTATE LEFT
+				if IsControlPressed(1, Keys['N4']) then
+					SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z + 0.7, 2)
+				end
+
+				-- ROTATE RIGHT
+				if IsControlPressed(1, Keys['N6']) then
+					SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z - 0.7, 2)
+				end
+
+			elseif Config.Locations[currentCameraIndex].policeCameras[currentCameraIndexIndex].canRotate then
+				local getCameraRot = GetCamRot(createdCamera, 2)
+
+				-- ROTATE LEFT
+				if IsControlPressed(1, Keys['N4']) then
+					SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z + 0.7, 2)
+				end
+
+				-- ROTATE RIGHT
+				if IsControlPressed(1, Keys['N6']) then
+					SetCamRot(createdCamera, getCameraRot.x, 0.0, getCameraRot.z - 0.7, 2)
+				end
+			end
+
+		end
+	end
+end)
+
+function StartHideHUD()
+	Citizen.CreateThread(function()
+		while blockbuttons do
+			Citizen.Wait(100)
+
+			DisplayRadar(false)
+			ESX.UI.HUD.SetDisplay(0.0)
+			TriggerEvent('es:setMoneyDisplay', 0.0)
+			TriggerEvent('esx_status:setDisplay', 0.0)
+		end
+	end)
+end
+
+function mycbpolice(success, timeRemaining)
 	if success then
 		TriggerEvent('mhacking:hide')
 		TriggerServerEvent('esx_securitycam:setPoliceHackedState', true)
 
 		if Config.pNotify then
-		TriggerEvent("pNotify:SendNotification",{
-							text = _U('hacking_succeed'),
-							type = "success",
-							timeout = (7000),
-							layout = "bottomCenter",
-							queue = "global"
-						})
+			TriggerEvent("pNotify:SendNotification", {
+				text = _U('hacking_succeed'),
+				type = "success",
+				timeout = (7000),
+				layout = "bottomCenter",
+				queue = "global"
+			})
 		else
-		ESX.ShowNotification(_U('hacking_succeed'))
+			ESX.ShowNotification(_U('hacking_succeed'))
 		end
 	else
 		TriggerEvent('mhacking:hide')
 		if Config.pNotify then
-		TriggerEvent("pNotify:SendNotification",{
-							text = _U('hacking_failed'),
-							type = "warning",
-							timeout = (7000),
-							layout = "bottomCenter",
-							queue = "global"
-						})
+			TriggerEvent("pNotify:SendNotification",{
+				text = _U('hacking_failed'),
+				type = "warning",
+				timeout = (7000),
+				layout = "bottomCenter",
+				queue = "global"
+			})
 		else
-		ESX.ShowNotification(_U('hacking_failed'))
+			ESX.ShowNotification(_U('hacking_failed'))
 		end
+
 		PlaySoundFrontend(-1, "Bed", "WastedSounds", 1)
 		ShakeGameplayCam("DEATH_FAIL_IN_EFFECT_SHAKE", 1.0)
 		Citizen.Wait(500)
@@ -548,7 +547,7 @@ function mycbpolice(success, timeremaining)
 	end
 end
 
-function mycbbank(success, timeremaining)
+function mycbbank(success, timeRemaining)
 	if success then
 		TriggerEvent('mhacking:hide')
 		TriggerServerEvent('esx_securitycam:setBankHackedState', true)
@@ -566,16 +565,17 @@ function mycbbank(success, timeremaining)
 	else
 		TriggerEvent('mhacking:hide')
 		if Config.pNotify then
-		TriggerEvent("pNotify:SendNotification",{
-							text = _U('hacking_failed'),
-							type = "warning",
-							timeout = (7000),
-							layout = "bottomCenter",
-							queue = "global"
-						})
+			TriggerEvent("pNotify:SendNotification", {
+				text = _U('hacking_failed'),
+				type = "warning",
+				timeout = (7000),
+				layout = "bottomCenter",
+				queue = "global"
+			})
 		else
-		ESX.ShowNotification(_U('hacking_failed'))
+			ESX.ShowNotification(_U('hacking_failed'))
 		end
+
 		PlaySoundFrontend(-1, "Bed", "WastedSounds", 1)
 		ShakeGameplayCam("DEATH_FAIL_IN_EFFECT_SHAKE", 1.0)
 		Citizen.Wait(500)
@@ -587,59 +587,60 @@ end
 -- HACKING POLICE STATION
 Citizen.CreateThread(function()
 	while true do
+		Citizen.Wait(10)
+
 		if IsControlJustReleased(0, Keys['E']) and CurrentAction == 'hackingPolice' then
-		  if policeHacked then
-		   if Config.pNotify then
-			TriggerEvent("pNotify:SendNotification",{
-							text = _U('infected_cameras'),
-							type = "success",
-							timeout = (7000),
-							layout = "bottomCenter",
-							queue = "global"
-						})
-			else
-			ESX.ShowNotification(_U('infected_cameras'))
+			if policeHacked then
+				if Config.pNotify then
+					TriggerEvent("pNotify:SendNotification", {
+						text = _U('infected_cameras'),
+						type = "success",
+						timeout = (7000),
+						layout = "bottomCenter",
+						queue = "global"
+					})
+				else
+					ESX.ShowNotification(_U('infected_cameras'))
+				end
+			elseif not policeHacked then
+				TriggerEvent("mhacking:show")
+				TriggerEvent("mhacking:start", 2, 13, mycbpolice)
+				CurrentAction = nil
 			end
-		  elseif not policeHacked then
-			TriggerEvent("mhacking:show")
-			TriggerEvent("mhacking:start",2,13,mycbpolice)
-			CurrentAction = nil
-		  end
 		end
-		Citizen.Wait(0)
 	end
 end)
 
 -- HACKING BANK
 Citizen.CreateThread(function()
 	while true do
+		Citizen.Wait(10)
+
 		if IsControlJustReleased(0, Keys['E']) and CurrentAction == 'hackingBank' then
-		  if bankHacked then
-			if Config.pNotify then
-			TriggerEvent("pNotify:SendNotification",{
-							text = _U('infected_cameras'),
-							type = "success",
-							timeout = (7000),
-							layout = "bottomCenter",
-							queue = "global"
-						})
-			else
-			ESX.ShowNotification(_U('infected_cameras'))
+			if bankHacked then
+				if Config.pNotify then
+					TriggerEvent("pNotify:SendNotification", {
+						text = _U('infected_cameras'),
+						type = "success",
+						timeout = (7000),
+						layout = "bottomCenter",
+						queue = "global"
+					})
+				else
+					ESX.ShowNotification(_U('infected_cameras'))
+				end
+			elseif not bankHacked then
+				TriggerEvent("mhacking:show")
+				TriggerEvent("mhacking:start", 2, 13, mycbbank)
+				CurrentAction = nil
 			end
-		  elseif not bankHacked then
-			TriggerEvent("mhacking:show")
-			TriggerEvent("mhacking:start",2,13,mycbbank)
-			CurrentAction = nil
-		  end
 		end
-		Citizen.Wait(0)
 	end
 end)
 
 -- UNHACK BANK
 Citizen.CreateThread(function()
 	while true do
-
 		Citizen.Wait(0)
 
 		if IsControlJustReleased(0, Keys['E']) and CurrentAction == 'UnHackBank' then
@@ -678,16 +679,16 @@ Citizen.CreateThread(function()
 
 			CurrentAction = nil
 		end
-
 	end
 end)
 
 -- UNHACK POLICE
 Citizen.CreateThread(function()
 	while true do
+		Citizen.Wait(10)
+
 		if IsControlJustReleased(0, Keys['E']) and CurrentAction == 'UnHackPolice' then
 			if policeHacked then
-
 				TriggerServerEvent('esx_securitycam:unhackanimserver')
 				TriggerServerEvent('esx_securitycam:setPoliceHackedState', false)
 
@@ -702,7 +703,6 @@ Citizen.CreateThread(function()
 				else
 					ESX.ShowNotification(_U('removing_viruses'))
 				end
-
 			elseif not policeHacked then
 				if Config.pNotify then
 					TriggerEvent("pNotify:SendNotification", {
@@ -719,21 +719,8 @@ Citizen.CreateThread(function()
 
 			CurrentAction = nil
 		end
-		Citizen.Wait(0)
 	end
 end)
-
-
---[[Citizen.CreateThread(function()
-  while true do
-	Wait(0)
-	if CurrentAction ~= nil then
-	  SetTextComponentFormat('STRING')
-	  AddTextComponentString(CurrentActionMsg)
-	  DisplayHelpTextFromStringLabel(0, 0, 1, -1)
-	end
-  end
-end)]]
 
 function ChangeSecurityCamera(x, y, z, r)
 	if createdCamera ~= 0 then
@@ -745,7 +732,7 @@ function ChangeSecurityCamera(x, y, z, r)
 	SetCamCoord(cam, x, y, z)
 	SetCamRot(cam, r.x, r.y, r.z, 2)
 	RenderScriptCams(1, 0, 0, 1, 1)
-	Citizen.Wait(250)
+
 	createdCamera = cam
 end
 
@@ -759,8 +746,9 @@ end
 
 function CreateInstuctionScaleform(scaleform)
 	local scaleform = RequestScaleformMovie(scaleform)
+
 	while not HasScaleformMovieLoaded(scaleform) do
-		Citizen.Wait(0)
+		Citizen.Wait(10)
 	end
 
 	PushScaleformMovieFunction(scaleform, "CLEAR_ALL")
@@ -772,23 +760,20 @@ function CreateInstuctionScaleform(scaleform)
 
 	PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
 	PushScaleformMovieFunctionParameterInt(0)
-	InstructionButton(GetControlInstructionalButton(0, Keys["RIGHT"], true))
-	--InstructionButtonMessage("Next Camera")
-	InstructionButtonMessage(_U('next')) --SV LANGUAGE
+	PushScaleformMovieMethodParameterButtonName(GetControlInstructionalButton(0, Keys["RIGHT"], true))
+	InstructionButtonMessage(_U('next'))
 	PopScaleformMovieFunctionVoid()
 
 	PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
 	PushScaleformMovieFunctionParameterInt(1)
-	InstructionButton(GetControlInstructionalButton(0, Keys["LEFT"], true))
-	--InstructionButtonMessage("Previous Camera")
-	InstructionButtonMessage(_U('previous')) --SV LANGUAGE
+	PushScaleformMovieMethodParameterButtonName(GetControlInstructionalButton(0, Keys["LEFT"], true))
+	InstructionButtonMessage(_U('previous'))
 	PopScaleformMovieFunctionVoid()
 
 	PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
 	PushScaleformMovieFunctionParameterInt(2)
-	InstructionButton(GetControlInstructionalButton(0, Keys["BACKSPACE"], true))
-	--InstructionButtonMessage("Close Cameras")
-	InstructionButtonMessage(_U('close')) --SV LANGUAGE
+	PushScaleformMovieMethodParameterButtonName(GetControlInstructionalButton(0, Keys["BACKSPACE"], true))
+	InstructionButtonMessage(_U('close'))
 	PopScaleformMovieFunctionVoid()
 
 	PushScaleformMovieFunction(scaleform, "DRAW_INSTRUCTIONAL_BUTTONS")
@@ -804,10 +789,6 @@ function CreateInstuctionScaleform(scaleform)
 	return scaleform
 end
 
-function InstructionButton(ControlButton)
-	N_0xe83a3e3557a56640(ControlButton)
-end
-
 function InstructionButtonMessage(text)
 	BeginTextCommandScaleformString("STRING")
 	AddTextComponentScaleform(text)
@@ -816,17 +797,18 @@ end
 
 RegisterNetEvent('esx_securitycam:freeze')
 AddEventHandler('esx_securitycam:freeze', function(freeze)
-	FreezeEntityPosition(GetPlayerPed(-1), freeze)
+	FreezeEntityPosition(PlayerPedId(), freeze)
 end)
 
 -- UNHACK ANIMATION, IT'S NOT THE BEST ONE SO CHANGE IT IF YOU WANT AND SEND ME THE CODE AND I WILL CHANGE IT!
 RegisterNetEvent('esx_securitycam:unhackanim')
 AddEventHandler('esx_securitycam:unhackanim', function()
-  local pid = PlayerPedId()
-  RequestAnimDict("anim@heists@humane_labs@emp@hack_door")
-  while (not HasAnimDictLoaded("anim@heists@humane_labs@emp@hack_door")) do Citizen.Wait(0) end
+	local pid = PlayerPedId()
+	RequestAnimDict("anim@heists@humane_labs@emp@hack_door")
+	while (not HasAnimDictLoaded("anim@heists@humane_labs@emp@hack_door")) do Citizen.Wait(0) end
+
 	TaskPlayAnim(pid,"anim@heists@humane_labs@emp@hack_door","hack_loop",100.0, 200.0, 0.3, 9, 0.2, 0, 0, 0)
-	Wait(1000 * Config.AnimTime)
+	Citizen.Wait(1000 * Config.AnimTime)
 	StopAnimTask(pid, "anim@heists@humane_labs@emp@hack_door","hack_loop", 1.0)
 end)
 
@@ -856,21 +838,21 @@ Citizen.CreateThread(function()
 end)
 
 function DrawText3D(x, y, z, text, scale)
-    local onScreen, _x, _y = World3dToScreen2d(x, y, z)
-    local pX, pY, pZ = table.unpack(GetGameplayCamCoords())
- 
-    SetTextScale(scale, scale)
-    SetTextFont(4)
-    SetTextProportional(1)
-    SetTextEntry("STRING")
-    SetTextCentre(1)
-    SetTextColour(255, 255, 255, 215)
- 
-    AddTextComponentString(text)
-    DrawText(_x, _y)
- 
-    local factor = (string.len(text)) / 230
-    DrawRect(_x, _y + 0.0250, 0.095 + factor, 0.06, 41, 11, 41, 100)
+	local onScreen, _x, _y = World3dToScreen2d(x, y, z)
+	local pX, pY, pZ = table.unpack(GetGameplayCamCoords())
+
+	SetTextScale(scale, scale)
+	SetTextFont(4)
+	SetTextProportional(1)
+	SetTextEntry("STRING")
+	SetTextCentre(1)
+	SetTextColour(255, 255, 255, 215)
+
+	AddTextComponentString(text)
+	DrawText(_x, _y)
+
+	local factor = (string.len(text)) / 230
+	DrawRect(_x, _y + 0.0250, 0.095 + factor, 0.06, 41, 11, 41, 100)
 end
 
 RegisterNetEvent('esx_securitycam:setBankHackedState')

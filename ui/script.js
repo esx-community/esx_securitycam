@@ -1,47 +1,47 @@
 const CameraApp = new Vue({
-    el: "#Camera_Container",
+	el: "#Camera_Container",
 
-    data: {
-        camerasOpen: false,
-        cameraBoxLabel: "Testing",
-        cameraLabel: "Front Left Store Camera"
-    },
+	data: {
+		camerasOpen: false,
+		cameraBoxLabel: "Testing",
+		cameraLabel: "Front Left Store Camera"
+	},
 
-    methods: {
-        OpenCameras(boxLabel, label) {
-            this.camerasOpen = true;
-            this.cameraLabel = label;
-            this.cameraBoxLabel =  boxLabel;
-        },
+	methods: {
+		OpenCameras(boxLabel, label) {
+			this.camerasOpen = true;
+			this.cameraLabel = label;
+			this.cameraBoxLabel = boxLabel;
+		},
 
-        CloseCameras() {
-            this.camerasOpen = false;
-        },
+		CloseCameras() {
+			this.camerasOpen = false;
+		},
 
-        UpdateCameraLabel(label) {
-            this.cameraLabel = label;
-        }
-    }
+		UpdateCameraLabel(label) {
+			this.cameraLabel = label;
+		}
+	}
 });
 
 document.onreadystatechange = () => {
-    if (document.readyState === "complete") {
-        window.addEventListener('message', function(event) {
+	if (document.readyState === "complete") {
+		window.addEventListener('message', function (event) {
 
-            if (event.data.type == "enablecam") {
-                
-                CameraApp.OpenCameras(event.data.box, event.data.label);
+			if (event.data.type == "enablecam") {
 
-            } else if (event.data.type == "disablecam") {
+				CameraApp.OpenCameras(event.data.box, event.data.label);
 
-                CameraApp.CloseCameras();
+			} else if (event.data.type == "disablecam") {
 
-            } else if (event.data.type == "updatecam") {
+				CameraApp.CloseCameras();
 
-                CameraApp.UpdateCameraLabel(event.data.label);
+			} else if (event.data.type == "updatecam") {
 
-            }
+				CameraApp.UpdateCameraLabel(event.data.label);
 
-        });
-    };
+			}
+
+		});
+	};
 };
