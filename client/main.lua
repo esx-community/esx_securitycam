@@ -355,17 +355,13 @@ Citizen.CreateThread(function()
 					type = "disablecam",
 				})
 
-				if Config.HideRadar then
-					DisplayRadar(true)
-					ESX.UI.HUD.SetDisplay(1.0)
-					TriggerEvent('es:setMoneyDisplay', 1.0)
-					TriggerEvent('esx_status:setDisplay', 1.0)
-				end
-
 				CurrentAction = nil
 				bankcamera = false
 				policecamera = false
 				blockbuttons = false
+				if Config.HideRadar then
+					StopHideHUD()
+				end
 				TriggerEvent('esx_securitycam:freeze', false)
 			end
 
@@ -500,11 +496,22 @@ function StartHideHUD()
 	Citizen.CreateThread(function()
 		while blockbuttons do
 			Citizen.Wait(100)
-
 			DisplayRadar(false)
 			ESX.UI.HUD.SetDisplay(0.0)
 			TriggerEvent('es:setMoneyDisplay', 0.0)
 			TriggerEvent('esx_status:setDisplay', 0.0)
+		end
+	end)
+end
+
+function StopHideHUD()
+	Citizen.CreateThread(function()
+		while not blockbuttons do
+			Citizen.Wait(100)
+			DisplayRadar(true)
+			ESX.UI.HUD.SetDisplay(1.0)
+			TriggerEvent('es:setMoneyDisplay', 1.0)
+			TriggerEvent('esx_status:setDisplay', 1.0)
 		end
 	end)
 end
