@@ -151,8 +151,6 @@ Citizen.CreateThread(function()
 			end
 		end
 
-		local currentZone = nil
-
 		for k,v in pairs(Config.Zones) do
 			if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
 				if(GetDistanceBetweenCoords(coords, v.Pos.x, v.Pos.y, v.Pos.z, true) < 1.5) then
@@ -210,6 +208,8 @@ Citizen.CreateThread(function()
 			end
 		end
 
+		local currentZone = nil
+			
 		if (isInMarker and not HasAlreadyEnteredMarker) or (isInMarker and LastZone ~= currentZone) then
 			HasAlreadyEnteredMarker = true
 			LastZone = currentZone
