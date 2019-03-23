@@ -78,6 +78,8 @@ Citizen.CreateThread(function()
 		Citizen.Wait(1)
 
 		local coords = GetEntityCoords(PlayerPedId())
+		local isInMarker = false
+		local currentZone = nil
 
 		for k, v in pairs(Config.Zones) do
 			if PlayerData.job ~= nil and PlayerData.job.name ~= 'unemployed' and PlayerData.job.name == "police" then
@@ -207,8 +209,6 @@ Citizen.CreateThread(function()
 				end
 			end
 		end
-
-		local currentZone = nil
 			
 		if (isInMarker and not HasAlreadyEnteredMarker) or (isInMarker and LastZone ~= currentZone) then
 			HasAlreadyEnteredMarker = true
